@@ -1,13 +1,13 @@
-import { useFrame, useLoader } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useLoader } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
 import * as THREE from "three";
-import { Water } from "three/examples/jsm/objects/Water.js";
+import { WaterMesh } from "three/examples/jsm/objects/WaterMesh.js";
 
 type OceanProps = {
 	size?: number;
 	sunDirection?: THREE.Vector3;
-	sunColor?: THREE.ColorRepresentation;
-	waterColor?: THREE.ColorRepresentation;
+	sunColor?: number;
+	waterColor?: number;
 	distortionScale?: number;
 };
 
@@ -23,8 +23,6 @@ export function Ocean({
 	waterColor = 0x001e2f,
 	distortionScale = 3.7,
 }: OceanProps) {
-	const ref = useRef<Water>(null);
-
 	const waterNormals = useLoader(
 		THREE.TextureLoader,
 		"/water/waternormals.jpg",
@@ -34,31 +32,23 @@ export function Ocean({
 
 	const water = useMemo(() => {
 		const geometry = new THREE.PlaneGeometry(size, size);
-		const mesh = new Water(geometry, {
-			textureWidth: 512,
-			textureHeight: 512,
+		const mesh = new WaterMesh(geometry, {
 			waterNormals,
 			sunDirection: sunDirection?.clone() ?? new THREE.Vector3(0.707, 0.707, 0),
 			sunColor,
 			waterColor,
 			distortionScale,
-			fog: true,
 		});
 		mesh.rotation.x = -Math.PI / 2;
 		return mesh;
-	}, [size, waterNormals, sunColor, waterColor, distortionScale]);
-	// sunDirection handled via uniform update below so live changes work
+	}, [size, waterNormals, sunDirection, sunColor, waterColor, distortionScale]);
 
 	// keep sun direction uniform in sync if prop changes
-	if (sunDirection) {
-		(water.material.uniforms.sunDirection.value as THREE.Vector3).copy(
-			sunDirection,
-		);
-	}
+	useEffect(() => {
+		if (sunDirection) {
+			water.sunDirection.value.copy(sunDirection);
+		}
+	}, [water, sunDirection]);
 
-	useFrame((_, delta) => {
-		water.material.uniforms.time.value += delta;
-	});
-
-	return <primitive object={water} ref={ref} />;
+	return <primitive object={water} />;
 }
