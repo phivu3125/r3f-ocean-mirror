@@ -1,9 +1,11 @@
-import { OrbitControls, Sky } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useMemo } from "react";
 import * as THREE from "three";
+import { WebGPURenderer } from "three/webgpu";
 import { FloatingObjects } from "./scene/FloatingObjects";
 import { Ocean } from "./scene/Ocean";
+import { Sky } from "./scene/Sky";
 import { StatsPanel, StatsUpdater } from "./ui/StatsPanel";
 
 /**
@@ -37,11 +39,20 @@ export default function App() {
 			<Canvas
 				shadows
 				camera={{ position: [14, 3.5, 18], fov: 55, near: 0.1, far: 20000 }}
-				gl={{
-					antialias: true,
-					toneMapping: THREE.ACESFilmicToneMapping,
-					toneMappingExposure: 0.55,
-					outputColorSpace: THREE.SRGBColorSpace,
+				gl={async (props) => {
+					// WebGPU bootstrap via three/webgpu. Automatically falls back to
+					// WebGL2 if WebGPU is unavailable. `await renderer.init()` is
+					// REQUIRED before R3F begins rendering — skipping it produces a
+					// silent black canvas.
+					const renderer = new WebGPURenderer({
+						canvas: props.canvas as HTMLCanvasElement,
+						antialias: true,
+					});
+					renderer.toneMapping = THREE.ACESFilmicToneMapping;
+					renderer.toneMappingExposure = 0.55;
+					renderer.outputColorSpace = THREE.SRGBColorSpace;
+					await renderer.init();
+					return renderer;
 				}}
 			>
 				<Suspense fallback={null}>
