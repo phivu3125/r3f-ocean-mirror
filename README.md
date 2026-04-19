@@ -10,6 +10,8 @@ on the surface. Includes a collapsible FPS / perf panel.
 ![react](https://img.shields.io/badge/react-19-61dafb)
 ![renderer](https://img.shields.io/badge/renderer-WebGL-orange)
 
+![Demo screenshot](docs/demo.png)
+
 ## Run
 
 ```bash
