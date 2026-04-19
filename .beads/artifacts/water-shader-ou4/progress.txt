@@ -1,0 +1,17 @@
+# Progress Log
+
+Bead: water-shader-ou4
+Started: 2026-04-19
+
+## Codebase Patterns
+
+<!-- Consolidate reusable patterns here -->
+
+- R3F v9 + WebGPURenderer integration via async `gl` prop.
+- TSL (`three/tsl`) node material: `positionNode`, `normalNode`, `colorNode`.
+- Gerstner wave math shared between GPU (TSL `Fn`) and CPU (`sampleGerstner`) so floaters follow exactly.
+- Dual scrolling normal-map blend (RNB) for surface micro-detail on top of analytic waves.
+
+---
+
+<!-- Task logs below - APPEND ONLY -->
